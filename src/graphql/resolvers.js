@@ -1,15 +1,6 @@
-module.exports = {
+export default {
   Query: {
-    getUsers: () => [
-      {
-        userName: 'issa1',
-        email: 'issa@dddm.cdf',
-      },
-      {
-        userName: 'issa2',
-        email: 'issa@dddm.cdf2',
-      },
-    ],
+    getUsers: () => {},
     getAdmins: () => [
       {
         admin: 'hello',

@@ -1,14 +1,13 @@
-const { ApolloServer } = require('apollo-server');
-const typeDefs = require('./graphql/typeDefs');
-const resolvers = require('./graphql/resolvers');
-const { sequelize } = require('./database/models/index');
+import '@babel/polyfill';
+import { ApolloServer } from 'apollo-server';
+import typeDefs from './graphql/typeDefs';
+import resolvers from './graphql/resolvers';
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
 
-server.listen(3500).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
-  sequelize.authenticate().then(console.log('Connected to DB'));
-});
+server.listen(3500, console.log(`🚀 Server ready at 3500`));
+
+export default server;
