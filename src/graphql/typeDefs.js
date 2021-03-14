@@ -1,15 +1,15 @@
 import { gql } from 'apollo-server';
 
-module.exports = gql`
-  type Query {
-    getUsers: [User]
-    getAdmins: [Admin]
-  }
+export default gql`
   type User {
     userName: String!
     email: String!
+    password: String!
   }
-  type Admin {
-    admin: String!
+  type Query {
+    getUsers: [User]
+  }
+  type Mutation {
+    register(userName: String!, email: String!, password: String!): User!
   }
 `;
