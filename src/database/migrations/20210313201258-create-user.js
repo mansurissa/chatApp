@@ -11,10 +11,12 @@ module.exports = {
       userName: {
         type: Sequelize.STRING,
         allowNull: null,
+        unique: true,
       },
       email: {
         type: Sequelize.STRING,
         allowNull: null,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
