@@ -37,7 +37,11 @@ export default {
           throw new UserInputError('Incorrect password', '');
         }
         const token = signToken({ id: user.id, email: user.email });
-        return user;
+        return {
+          ...user.toJSON(),
+          createdAt: user.createdAt.toISOString(),
+          token,
+        };
       } catch (error) {
         console.log(error);
         throw error;
