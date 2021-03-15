@@ -14,6 +14,18 @@ export default {
         console.log(error);
       }
     },
+    getOneUser: async (_, args) => {
+      try {
+        const user = await findUser({ id: args.id });
+        if (!user) {
+          throw new UserInputError('User not found', '');
+        }
+        return user;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    },
     signin: async (_, args) => {
       try {
         const user = await findUser({ email: args.email });
@@ -32,6 +44,7 @@ export default {
       }
     },
   },
+
   Mutation: {
     register: async (_, args) => {
       const { userName, email, password } = args;
