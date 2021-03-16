@@ -14,6 +14,7 @@ export default {
         console.log(error);
       }
     },
+
     getOneUser: async (_, args) => {
       try {
         const user = await findUser({ id: args.id });
@@ -26,6 +27,7 @@ export default {
         throw error;
       }
     },
+
     signin: async (_, args) => {
       try {
         const user = await findUser({ email: args.email });
