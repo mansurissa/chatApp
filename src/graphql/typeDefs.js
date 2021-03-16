@@ -1,20 +1,46 @@
 import { gql } from 'apollo-server';
 
-export default gql`
+module.exports = gql`
   type User {
-    id: Int!
-    userName: String!
-    email: String!
-    password: String!
+    username: String!
+    email: String
     createdAt: String!
     token: String
+    imageUrl: String
+    latestMessage: Message
+  }
+  type Message {
+    uuid: String!
+    content: String!
+    from: String!
+    to: String!
+    createdAt: String!
+    reactions: [Reaction]
+  }
+  type Reaction {
+    uuid: String!
+    content: String!
+    createdAt: String!
+    message: Message!
+    user: User!
   }
   type Query {
-    getUsers: [User]
-    getOneUser(id: Int!): User!
-    signin(email: String!, password: String): User!
+    getUsers: [User]!
+    login(username: String!, password: String!): User!
+    getMessages(from: String!): [Message]!
   }
   type Mutation {
-    register(userName: String!, email: String!, password: String!): User!
+    register(
+      username: String!
+      email: String!
+      password: String!
+      confirmPassword: String!
+    ): User!
+    sendMessage(to: String!, content: String!): Message!
+    reactToMessage(uuid: String!, content: String!): Reaction!
+  }
+  type Subscription {
+    newMessage: Message!
+    newReaction: Reaction!
   }
 `;

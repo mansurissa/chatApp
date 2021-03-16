@@ -1,13 +1,26 @@
 import '@babel/polyfill';
 import { ApolloServer } from 'apollo-server';
-import typeDefs from './graphql/typeDefs';
+import { config } from 'dotenv';
+import { sequelize } from './database/models';
 import resolvers from './graphql/resolvers';
+import typeDefs from './graphql/typeDefs';
+import contextMiddleware from './util/contextMiddleware';
+
+config();
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: contextMiddleware,
+  subscriptions: { path: '/' },
 });
 
-server.listen(3500, console.log(`🚀 Server ready at 3500`));
+server.listen().then(({ url, subscriptionsUrl }) => {
+  console.log(`🚀 Server ready at ${url}`);
+  console.log(`🚀 Susbscription ready at ${subscriptionsUrl}`);
 
-export default server;
+  sequelize
+    .authenticate()
+    .then(() => console.log('Database connected!!'))
+    .catch((err) => console.log(err));
+});
