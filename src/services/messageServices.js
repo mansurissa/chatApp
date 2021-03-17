@@ -1,6 +1,6 @@
 import Models from '../database/models';
 
-const { Message } = Models;
+const { Message, Reaction } = Models;
 
 export const createMessage = async (message) => {
   const meaasge = await Message.create(message);
@@ -14,7 +14,7 @@ export const findMessages = async (params) => {
   const messages = await Message.findAll({
     where: params,
     order: [['createdAt', 'DESC']],
-    include: [{ model: Reaction, as: 'reactions' }],
+    // include: [{ model: Reaction, as: 'reactions' }],
   });
   return messages;
 };

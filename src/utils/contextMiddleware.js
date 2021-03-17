@@ -12,7 +12,6 @@ export default (context) => {
   }
 
   if (token) context.user = verifyToken(token);
-
   context.pubsub = pubsub;
 
   return context;

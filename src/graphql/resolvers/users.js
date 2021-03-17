@@ -1,22 +1,19 @@
 import { UserInputError, AuthenticationError } from 'apollo-server';
 import { Op } from 'sequelize';
-import { Message } from '../../database/models';
 import { createUser, findUser, findUsers } from '../../services/userServices';
 import { decryptPassword, encryptPassword, signToken } from '../../utils/auth';
 import { validateCreate } from '../../validators/userValidator';
+import { findMessages } from '../../services/messageServices';
 
 export default {
   Query: {
     getUsers: async (_, __, { user }) => {
       try {
-        if (!user) throw new AuthenticationError('Unauthenticated');
+        if (!user) throw new AuthenticationError('Unauthenticated ');
         let users = await findUsers({ username: { [Op.ne]: user.username } });
 
-        const allUserMessages = await Message.findAll({
-          where: {
-            [Op.or]: [{ from: user.username }, { to: user.username }],
-          },
-          order: [['createdAt', 'DESC']],
+        const allUserMessages = await findMessages({
+          [Op.or]: [{ from: user.username }, { to: user.username }],
         });
 
         users = users.map((otherUser) => {
