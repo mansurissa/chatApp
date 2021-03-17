@@ -1,6 +1,6 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('messages', {
+    await queryInterface.createTable('Messages', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -13,7 +13,7 @@ module.exports = {
       },
       uuid: {
         type: Sequelize.UUID,
-        defaultValue: Sequelize.UUIDV1,
+        defaultValue: Sequelize.UUIDV4,
         allowNull: false,
       },
       from: {
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('messages');
+    await queryInterface.dropTable('Messages');
   },
 };

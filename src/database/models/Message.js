@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       uuid: {
         type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV1,
+        defaultValue: DataTypes.UUIDV4,
         allowNull: false,
       },
       from: {
@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Message',
-      tableName: 'messages',
     },
   );
   return Message;

@@ -2,15 +2,13 @@ const bcrypt = require('bcryptjs');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    const password = await bcrypt.hash('123456', 6);
+    const password = await bcrypt.hash('123456', 10);
     const createdAt = new Date();
     const updatedAt = createdAt;
 
-    // https://unsplash.com/photos/ZHvM3XIOHoE
-    // https://unsplash.com/photos/b1Hg7QI-zcc
-    // https://unsplash.com/photos/RiDxDgHg7pw
+    console.log(updatedAt);
 
-    await queryInterface.bulkInsert('users', [
+    await queryInterface.bulkInsert('Users', [
       {
         username: 'user1',
         email: 'user1@email.com',
@@ -42,6 +40,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkDelete('users', null, {});
+    await queryInterface.bulkDelete('Users', null, {});
   },
 };
