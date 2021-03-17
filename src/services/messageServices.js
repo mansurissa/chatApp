@@ -14,7 +14,14 @@ export const findMessages = async (params) => {
   const messages = await Message.findAll({
     where: params,
     order: [['createdAt', 'DESC']],
-    // include: [{ model: Reaction, as: 'reactions' }],
+  });
+  return messages;
+};
+export const FindAllMessages = async (params) => {
+  const messages = await Message.findAll({
+    where: params,
+    order: [['createdAt', 'DESC']],
+    include: [{ model: Reaction, as: 'reactions' }],
   });
   return messages;
 };

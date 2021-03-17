@@ -12,7 +12,7 @@ export const findUser = async (param) => {
 };
 export const findUsers = async (params) => {
   const users = await User.findAll({
-    attributes: ['username', 'imageUrl', 'createdAt'],
+    attributes: ['username', 'imageUrl', 'createdAt', 'email', 'id'],
     where: params,
   });
   return users;
