@@ -10,10 +10,6 @@ export default {
     getUsers: async (_, __, { user }) => {
       try {
         if (!user) throw new AuthenticationError('Unauthenticated');
-        // let users = await User.findAll({
-        //   attributes: ['username', 'imageUrl', 'createdAt'],
-        //   where: { username: { [Op.ne]: user.username } },
-        // });
         let users = await findUsers({ username: { [Op.ne]: user.username } });
 
         const allUserMessages = await Message.findAll({
@@ -50,10 +46,6 @@ export default {
           throw new UserInputError('bad input', { errors });
         }
 
-        // const user = await User.findOne({
-        //   where: { username },
-        // });
-
         const user = await findUser({ username });
 
         if (!user) {
@@ -61,16 +53,12 @@ export default {
           throw new UserInputError('user not found', { errors });
         }
 
-        // const correctPassword = await bcrypt.compare(password, user.password);
-        const correctPassword = decryptPassword(password, user.password);
+        const correctPassword = await decryptPassword(password, user.password);
         if (!correctPassword) {
           errors.password = 'password is incorrect';
           throw new UserInputError('password is incorrect', { errors });
         }
 
-        // const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-        //   expiresIn: 60 * 60,
-        // });
         const token = signToken({ username });
 
         return {
