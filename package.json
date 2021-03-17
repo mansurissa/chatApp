@@ -25,7 +25,9 @@
     "nodemon": "^2.0.4"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/server.js --ignore client/",
+    "server": "nodemon --exec babel-node src/server.js --ignore client/",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "start": "node src/server.js",
     "migrate": "sequelize db:migrate",
     "migrate:undo": "sequelize db:migrate:undo",
