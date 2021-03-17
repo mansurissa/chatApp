@@ -8,8 +8,8 @@ import { Op } from 'sequelize';
 import { Reaction } from '../../database/models';
 import {
   createMessage,
-  FindAllMessages,
   findMessage,
+  findMessages,
 } from '../../services/messageServices';
 import { findUser } from '../../services/userServices';
 
@@ -24,7 +24,7 @@ export default {
 
         const usernames = [user.username, otherUser.username];
 
-        const messages = await FindAllMessages({
+        const messages = await findMessages({
           from: { [Op.in]: usernames },
           to: { [Op.in]: usernames },
         });
