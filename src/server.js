@@ -4,7 +4,7 @@ import { config } from 'dotenv';
 import { sequelize } from './database/models';
 import resolvers from './graphql/resolvers';
 import typeDefs from './graphql/typeDefs';
-import contextMiddleware from './util/contextMiddleware';
+import contextMiddleware from './utils/contextMiddleware';
 
 config();
 

@@ -5,7 +5,13 @@ import {
   withFilter,
 } from 'apollo-server';
 import { Op } from 'sequelize';
-import { Message, User, Reaction } from '../../database/models';
+import { Reaction } from '../../database/models';
+import {
+  createMessage,
+  findMessage,
+  findMessages,
+} from '../../services/messageServices';
+import { findUser } from '../../services/userServices';
 
 export default {
   Query: {
@@ -13,20 +19,14 @@ export default {
       try {
         if (!user) throw new AuthenticationError('Unauthenticated');
 
-        const otherUser = await User.findOne({
-          where: { username: from },
-        });
+        const otherUser = await findUser({ username: from });
         if (!otherUser) throw new UserInputError('User not found');
 
         const usernames = [user.username, otherUser.username];
 
-        const messages = await Message.findAll({
-          where: {
-            from: { [Op.in]: usernames },
-            to: { [Op.in]: usernames },
-          },
-          order: [['createdAt', 'DESC']],
-          include: [{ model: Reaction, as: 'reactions' }],
+        const messages = await findMessages({
+          from: { [Op.in]: usernames },
+          to: { [Op.in]: usernames },
         });
 
         return messages;
@@ -41,7 +41,7 @@ export default {
       try {
         if (!user) throw new AuthenticationError('Unauthenticated');
 
-        const recipient = await User.findOne({ where: { username: to } });
+        const recipient = await findUser({ username: to });
 
         if (!recipient) {
           throw new UserInputError('User not found');
@@ -53,7 +53,7 @@ export default {
           throw new UserInputError('Message is empty');
         }
 
-        const message = await Message.create({
+        const message = await createMessage({
           from: user.username,
           to,
           content,
@@ -67,22 +67,20 @@ export default {
         throw err;
       }
     },
+
     reactToMessage: async (_, { uuid, content }, { user, pubsub }) => {
       const reactions = ['❤️', '😆', '😯', '😢', '😡', '👍', '👎'];
 
       try {
-        // Validate reaction content
         if (!reactions.includes(content)) {
           throw new UserInputError('Invalid reaction');
         }
 
-        // Get user
         const username = user ? user.username : '';
-        user = await User.findOne({ where: { username } });
+        user = await findUser({ username });
         if (!user) throw new AuthenticationError('Unauthenticated');
 
-        // Get message
-        const message = await Message.findOne({ where: { uuid } });
+        const message = findMessage({ where: { uuid } });
         if (!message) throw new UserInputError('message not found');
 
         if (message.from !== user.username && message.to !== user.username) {
@@ -94,11 +92,9 @@ export default {
         });
 
         if (reaction) {
-          // Reaction exists, update it
           reaction.content = content;
           await reaction.save();
         } else {
-          // Reaction doesnt exists, create it
           reaction = await Reaction.create({
             messageId: message.id,
             userId: user.id,

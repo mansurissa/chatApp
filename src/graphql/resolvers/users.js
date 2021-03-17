@@ -1,19 +1,20 @@
-import bcrypt from 'bcryptjs';
 import { UserInputError, AuthenticationError } from 'apollo-server';
-import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
-import { Message, User } from '../../database/models';
+import { Message } from '../../database/models';
+import { createUser, findUser, findUsers } from '../../services/userServices';
+import { decryptPassword, encryptPassword, signToken } from '../../utils/auth';
+import { validateCreate } from '../../validators/userValidator';
 
 export default {
   Query: {
     getUsers: async (_, __, { user }) => {
       try {
         if (!user) throw new AuthenticationError('Unauthenticated');
-
-        let users = await User.findAll({
-          attributes: ['username', 'imageUrl', 'createdAt'],
-          where: { username: { [Op.ne]: user.username } },
-        });
+        // let users = await User.findAll({
+        //   attributes: ['username', 'imageUrl', 'createdAt'],
+        //   where: { username: { [Op.ne]: user.username } },
+        // });
+        let users = await findUsers({ username: { [Op.ne]: user.username } });
 
         const allUserMessages = await Message.findAll({
           where: {
@@ -49,25 +50,28 @@ export default {
           throw new UserInputError('bad input', { errors });
         }
 
-        const user = await User.findOne({
-          where: { username },
-        });
+        // const user = await User.findOne({
+        //   where: { username },
+        // });
+
+        const user = await findUser({ username });
 
         if (!user) {
           errors.username = 'user not found';
           throw new UserInputError('user not found', { errors });
         }
 
-        const correctPassword = await bcrypt.compare(password, user.password);
-
+        // const correctPassword = await bcrypt.compare(password, user.password);
+        const correctPassword = decryptPassword(password, user.password);
         if (!correctPassword) {
           errors.password = 'password is incorrect';
           throw new UserInputError('password is incorrect', { errors });
         }
 
-        const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-          expiresIn: 60 * 60,
-        });
+        // const token = jwt.sign({ username }, process.env.JWT_SECRET, {
+        //   expiresIn: 60 * 60,
+        // });
+        const token = signToken({ username });
 
         return {
           ...user.toJSON(),
@@ -81,44 +85,24 @@ export default {
   },
   Mutation: {
     register: async (_, args) => {
-      let { username, email, password, confirmPassword } = args;
+      let { username, email, confirmPassword } = args;
       let errors = {};
 
       try {
-        // Validate input data
-        if (email.trim() === '') errors.email = 'email must not be empty';
-        if (username.trim() === '')
-          errors.username = 'username must not be empty';
-        if (password.trim() === '')
-          errors.password = 'password must not be empty';
-        if (confirmPassword.trim() === '')
-          errors.confirmPassword = 'repeat password must not be empty';
-
         if (password !== confirmPassword)
           errors.confirmPassword = 'passwords must match';
 
-        // // Check if username / email exists
-        // const userByUsername = await User.findOne({ where: { username } })
-        // const userByEmail = await User.findOne({ where: { email } })
-
-        // if (userByUsername) errors.username = 'Username is taken'
-        // if (userByEmail) errors.email = 'Email is taken'
-
+        const validate = validateCreate(args);
+        if (!validate) {
+          errors.validate = validate;
+        }
         if (Object.keys(errors).length > 0) {
           throw errors;
         }
 
-        // Hash password
-        password = await bcrypt.hash(password, 6);
+        const password = await encryptPassword(password);
+        const user = await createUser({ user, email, password });
 
-        // Create user
-        const user = await User.create({
-          username,
-          email,
-          password,
-        });
-
-        // Return user
         return user;
       } catch (err) {
         console.log(err);
