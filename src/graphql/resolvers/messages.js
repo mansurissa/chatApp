@@ -26,7 +26,7 @@ export default {
 
         const messages = await findMessages({
           from: { [Op.in]: usernames },
-          to: { [Op.in]: usernames },
+          to: { [Op.not]: usernames },
         });
 
         return messages;
